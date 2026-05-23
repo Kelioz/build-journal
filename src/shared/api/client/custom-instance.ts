@@ -1,7 +1,8 @@
+import { Config } from '@/shared/config'
 import Axios, { AxiosRequestConfig } from 'axios'
 
 export const AXIOS_INSTANCE = Axios.create({
-  baseURL: 'http://localhost:3000/',
+  baseURL: Config.API_URL,
 })
 
 export const customInstance = <T>(

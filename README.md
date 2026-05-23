@@ -1,116 +1,61 @@
-# Журнал работ (Frontend)
+# Журнал работ — Фронтенд (React + TypeScript + Vite)
 
-Коротко: React + TypeScript + Vite + Ant Design. Клиент сгенерирован из `openapi.yml` (Orval). UI использует Ant Design для быстрого прототипа.
+Коротко: это фронтенд-приложение для проекта «Журнал работ на строительном объекте». Клиент реализован на React + TypeScript, собран с помощью Vite и использует Ant Design для интерфейса. API взаимодействует с backend (NestJS + Prisma), описан в OpenAPI/Swagger и расположен отдельно.
 
-Стек:
+---
 
-- React 19 + TypeScript
-- Vite (сборка / dev)
-- Ant Design (компоненты)
-- Axios (через сгенерированный `custom-instance`)
+## Что внутри
 
-Особенности реализации:
+- Интерактивный UI для просмотра, создания и редактирования записей журнала работ.
+- Сгенерированный клиент API находится в `src/shared/api/client` (Orval/OpenAPI).
+- Страницы: список записей (`src/pages/JournalList.tsx`) и форма создания/редактирования (`src/pages/JournalForm.tsx`).
 
-- Страницы: список записей (`/`) и форма создания/редактирования (`/create`, `/edit/:id`).
-- Использован сгенерированный клиент в `src/shared/api/client` для взаимодействия с бэкендом.
-- В `src/pages` добавлены `JournalList.tsx` и `JournalForm.tsx`.
+---
 
-Запуск локально:
+## Быстрый старт — локальная разработка
 
-1. Установить зависимости:
+1. Установите зависимости:
 
 ```bash
-yarn
+yarn install
 ```
 
-2. Запустить dev-сервер:
+2. Создайте файл окружения (опционально) — `.env` в корне проекта и укажите адрес API:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+3. Запустите dev-сервер:
 
 ```bash
 yarn dev
 ```
 
-Примечания:
+4. Откройте приложение в браузере по адресу, который выдаст Vite (обычно `http://localhost:5173`).
 
-- В `src/shared/api/client/custom-instance.ts` указан `baseURL` — убедитесь, что бэкенд доступен по этому адресу, либо замените на локальный (`http://localhost:3000`) при запуске бэкенда локально.
-- Если при запуске `yarn dev` возникает ошибка из-за пути к проекту (необычные символы в имени папки), попробуйте переименовать папку проекта в путь без кириллицы и специальных символов.
+---
 
-Дальше можно (опционально):
+## Скрипты (из `package.json`)
 
-- добавить пагинацию, фильтры по виду работ и экспорты в CSV/PDF;
-- стилизовать приложение по дизайну из ТЗ.
+- `dev` — запуск в режиме разработки
+- `build` — сборка production
+- `preview` — локальный просмотр собранной версии
 
-# React + TypeScript + Vite
+Проверьте `package.json` в корне для точных команд.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+---
 
-Currently, two official plugins are available:
+## Конфигурация API / интеграция с backend
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Переменная окружения: `VITE_API_BASE_URL` — базовый URL API (например, `http://localhost:3000`).
+- Клиент API сгенерирован исходя из `openapi/openapi.yml` и размещён в `src/shared/api/client`.
+- Рекомендуемые эндпоинты backend (см. Swagger backend):
+  - `GET /work-types` — список видов работ (для селекта в форме)
+  - `GET /journal?from=YYYY-MM-DD&to=YYYY-MM-DD&sort=asc|desc` — список записей
+  - `POST /journal` — создать запись
+  - `GET /journal/:id` — получить запись
+  - `PUT /journal/:id` — обновить запись
+  - `DELETE /journal/:id` — удалить запись
 
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- Swagger UI backend доступен по `http://localhost:3000/api` после запуска сервера — там можно посмотреть схемы и примеры запросов.
