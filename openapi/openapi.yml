@@ -1,0 +1,335 @@
+openapi: 3.0.0
+paths:
+  /api/users:
+    post:
+      operationId: UsersController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+      summary: Create user
+      tags:
+        - users
+    get:
+      operationId: UsersController_getAll
+      parameters: []
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponseDto'
+      summary: Get all users
+      tags:
+        - users
+  /api/users/{id}:
+    get:
+      operationId: UsersController_getOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: User by id
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+      summary: Get user by id
+      tags:
+        - users
+    put:
+      operationId: UsersController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: Updated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponseDto'
+      summary: Update user
+      tags:
+        - users
+    delete:
+      operationId: UsersController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Deleted user
+      summary: Delete user
+      tags:
+        - users
+  /api/work-types:
+    get:
+      operationId: WorkTypesController_findAll
+      parameters: []
+      responses:
+        '200':
+          description: Available work types
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkTypeDto'
+      summary: List available work types
+      tags:
+        - work-types
+  /api/journal:
+    post:
+      operationId: JournalController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateJournalDto'
+      responses:
+        '201':
+          description: Created journal entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResponseDto'
+      summary: Create journal entry
+      tags:
+        - journal
+    get:
+      operationId: JournalController_findAll
+      parameters:
+        - name: from
+          required: false
+          in: query
+          description: Start date (inclusive) in ISO format
+          schema:
+            type: string
+        - name: to
+          required: false
+          in: query
+          description: End date (inclusive) in ISO format
+          schema:
+            type: string
+        - name: sort
+          required: false
+          in: query
+          description: 'Sort by date: asc or desc'
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JournalResponseDto'
+      summary: List journal entries; filter by from/to (ISO date), sort=asc|desc
+      tags:
+        - journal
+  /api/journal/{id}:
+    get:
+      operationId: JournalController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Journal entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResponseDto'
+      tags:
+        - journal
+    put:
+      operationId: JournalController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateJournalDto'
+      responses:
+        '200':
+          description: Updated entry
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JournalResponseDto'
+      tags:
+        - journal
+    delete:
+      operationId: JournalController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Deleted entry
+      tags:
+        - journal
+info:
+  title: Project API
+  description: Backend API (Prisma + NestJS)
+  version: '1.0'
+  contact: {}
+tags: []
+servers: []
+components:
+  schemas:
+    CreateUserDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: ivanov@example.com
+        name:
+          type: string
+          example: Иван Иванов
+      required:
+        - email
+    UserResponseDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        email:
+          type: string
+          example: ivanov@example.com
+        name:
+          type: string
+          example: Иван Иванов
+        createdAt:
+          type: string
+          example: '2026-05-23T21:51:08.880Z'
+      required:
+        - id
+        - email
+        - createdAt
+    UpdateUserDto:
+      type: object
+      properties: {}
+    WorkTypeDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        name:
+          type: string
+          example: Кладка перегородок
+      required:
+        - id
+        - name
+    CreateJournalDto:
+      type: object
+      properties:
+        date:
+          type: string
+          example: '2026-05-23T21:51:08.946Z'
+        workTypeId:
+          type: number
+          example: 1
+        volume:
+          type: number
+          example: 24
+        unit:
+          type: string
+          example: м³
+        performer:
+          type: string
+          example: Иванов И.И.
+        notes:
+          type: string
+          example: Примечание
+      required:
+        - date
+        - workTypeId
+        - volume
+        - unit
+        - performer
+    JournalResponseDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+        date:
+          type: string
+          example: '2026-05-23T21:51:08.953Z'
+        workType:
+          $ref: '#/components/schemas/WorkTypeDto'
+        volume:
+          type: number
+          example: 24
+        unit:
+          type: string
+          example: м³
+        performer:
+          type: string
+          example: Петров Петр
+        notes:
+          type: string
+          example: Примечание
+        createdAt:
+          type: string
+          example: '2026-05-23T21:51:08.953Z'
+      required:
+        - id
+        - date
+        - workType
+        - volume
+        - unit
+        - performer
+        - createdAt
+    UpdateJournalDto:
+      type: object
+      properties: {}
