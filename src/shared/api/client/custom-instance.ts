@@ -1,4 +1,4 @@
-import { Config } from '@/shared/config'
+import { Config } from '../../config/index'
 import Axios, { AxiosRequestConfig } from 'axios'
 
 export const AXIOS_INSTANCE = Axios.create({
