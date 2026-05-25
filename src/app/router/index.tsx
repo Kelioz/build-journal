@@ -1,5 +1,5 @@
-import { JournalListPage } from '@/pages/HournalListPage/JournalList'
-import { JournalFormPage } from '@/pages/JournalFormPage/JournalForm'
+import { JournalListPage } from '@/pages/JournalListPage/JournalList'
+import { JournalFormPage } from '@/entities/journal/ui/JournalForm/JournalForm'
 import { Routes, Route } from 'react-router-dom'
 
 export function Router() {
@@ -7,7 +7,6 @@ export function Router() {
     <Routes>
       <Route path='/' element={<JournalListPage />} />
       <Route path='/create' element={<JournalFormPage />} />
-      <Route path='/edit/:id' element={<JournalFormPage />} />
     </Routes>
   )
 }

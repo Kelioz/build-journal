@@ -7,27 +7,23 @@ import {
   Select,
   DatePicker,
   message,
+  Space,
 } from 'antd'
-import { useNavigate, useParams } from 'react-router-dom'
 import dayjs from 'dayjs'
 import type { CreateJournalDto, UpdateJournalDto } from '@/shared/api/client'
 import { JournalModel } from '@/entities/journal'
 import { WorkTypeModel } from '@/entities/workType'
+import { JournalFormProps, JournalFormValues, UNIT_OPTIONS } from './types'
 
 const { TextArea } = Input
 
-interface JournalFormValues {
-  date: dayjs.Dayjs
-  workTypeId: number
-  volume: number
-  unit: string
-  performer: string
-  notes?: string
-}
-
-export function JournalFormPage() {
+export function JournalFormPage({
+  id,
+  onSuccess,
+  onCancel,
+  ...props
+}: JournalFormProps) {
   const [form] = Form.useForm<JournalFormValues>()
-  const { id } = useParams<{ id?: string }>()
 
   const { data: workTypes = [], isLoading: workTypesLoading } =
     WorkTypeModel.Hooks.useWorkTypesFindAll()
@@ -35,7 +31,6 @@ export function JournalFormPage() {
     JournalModel.Hooks.useJournalFindOne(id ? Number(id) : undefined)
   const createJournal = JournalModel.Hooks.useJournalCreate()
   const updateJournal = JournalModel.Hooks.useJournalUpdate()
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (journalData && id) {
@@ -47,6 +42,9 @@ export function JournalFormPage() {
         performer: journalData.performer,
         notes: journalData.notes,
       })
+    } else if (!id) {
+      form.resetFields()
+      form.setFieldsValue({ unit: 'м³' })
     }
   }, [journalData, id, form])
 
@@ -64,13 +62,12 @@ export function JournalFormPage() {
       if (id) {
         const updateData: UpdateJournalDto = payload
         await updateJournal.mutateAsync({ id: Number(id), data: updateData })
-        message.success('Запись обновлена')
       } else {
         const createData: CreateJournalDto = payload
         await createJournal.mutateAsync(createData)
-        message.success('Запись создана')
       }
-      navigate('/')
+
+      onSuccess?.()
     } catch {
       message.error('Ошибка при сохранении')
     }
@@ -88,28 +85,31 @@ export function JournalFormPage() {
       layout='vertical'
       onFinish={onFinish}
       initialValues={{ unit: 'м³' }}
+      {...props}
     >
       <Form.Item name='date' label='Дата' rules={[{ required: true }]}>
-        <DatePicker showTime />
+        <DatePicker
+          showTime
+          style={{ width: '100%' }}
+          placeholder='Выберите дату'
+        />
       </Form.Item>
       <Form.Item
         name='workTypeId'
         label='Вид работ'
         rules={[{ required: true }]}
       >
-        <Select>
-          {workTypes.map((w) => (
-            <Select.Option key={w.id} value={w.id}>
-              {w.name}
-            </Select.Option>
-          ))}
-        </Select>
+        <Select
+          placeholder='Выберите вид работ'
+          loading={workTypesLoading}
+          options={workTypes.map((w) => ({ label: w.name, value: w.id }))}
+        />
       </Form.Item>
       <Form.Item name='volume' label='Объём' rules={[{ required: true }]}>
         <InputNumber style={{ width: '100%' }} />
       </Form.Item>
       <Form.Item name='unit' label='Единица' rules={[{ required: true }]}>
-        <Input />
+        <Select options={UNIT_OPTIONS} />
       </Form.Item>
       <Form.Item
         name='performer'
@@ -122,9 +122,12 @@ export function JournalFormPage() {
         <TextArea rows={3} />
       </Form.Item>
       <Form.Item>
-        <Button type='primary' htmlType='submit' loading={isLoading}>
-          Сохранить
-        </Button>
+        <Space>
+          <Button type='primary' htmlType='submit' loading={isLoading}>
+            Сохранить
+          </Button>
+          <Button onClick={onCancel}>Отмена</Button>
+        </Space>
       </Form.Item>
     </Form>
   )
